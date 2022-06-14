@@ -124,6 +124,18 @@
     #endif
 #endif
 
+// Macros for Clang TSA (Thread Safety Analysis), can be safely ignored by other compilers.
+// Feel free to extend, but make sure to stay close to https://clang.llvm.org/docs/ThreadSafetyAnalysis.html#mutexheader
+#if defined(__clang__)
+#    define TSA_GUARDED_BY(...) __attribute__((guarded_by(__VA_ARGS__)))
+#    define TSA_REQUIRES(...) __attribute__((requires_capability(__VA_ARGS__)))
+#    define TSA_NO_THREAD_SAFETY_ANALYSIS __attribute__((no_thread_safety_analysis))
+#else
+#    define TSA_GUARDED_BY(...)
+#    define TSA_REQUIRES(...)
+#    define TSA_NO_THREAD_SAFETY_ANALYSIS
+#endif
+
 /// A template function for suppressing warnings about unused variables or function results.
 template <typename... Args>
 constexpr void UNUSED(Args &&... args [[maybe_unused]])

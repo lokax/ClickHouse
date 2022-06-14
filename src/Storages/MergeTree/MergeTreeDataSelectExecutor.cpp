@@ -1102,6 +1102,11 @@ std::shared_ptr<QueryIdHolder> MergeTreeDataSelectExecutor::checkLimits(
                 max_partitions_to_read);
     }
 
+// TSA is confused by guaranteed copy elision in data.getQueryIdSetLock()
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wthread-safety-analysis"
+#endif
     if (data_settings->max_concurrent_queries > 0 && data_settings->min_marks_to_honor_max_concurrent_queries > 0
         && result.selected_marks >= data_settings->min_marks_to_honor_max_concurrent_queries)
     {
@@ -1124,6 +1129,9 @@ std::shared_ptr<QueryIdHolder> MergeTreeDataSelectExecutor::checkLimits(
             }
         }
     }
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
     return nullptr;
 }
 
